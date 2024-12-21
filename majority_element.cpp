@@ -39,6 +39,5 @@ int main(){
         cout << "The majority element is " << majority;
     }
     
-    
     return 0;
 }
