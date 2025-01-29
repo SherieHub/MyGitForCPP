@@ -30,7 +30,7 @@ class LinkedList: public List{
         size++;
     }
     
-    int removeHead(){
+    int removeHead(){ // T(n) = 9
         if(!head) return -1;
         
         node* temp = head;
@@ -42,13 +42,10 @@ class LinkedList: public List{
         return removedNum;
     }
     
-    int get(int pos){
+    int get(int pos){ //T(n) =
         node* curr = head;
-        int ctr = 1;
-        
-        while(curr != NULL && ctr != pos){
+        for (int i = 1; i < pos; i++) {
             curr = curr->next;
-            ctr++;
         }
         return curr->elem;
     }

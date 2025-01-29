@@ -19,24 +19,25 @@ class LinkedList : public List{
     }
 
     int removeNode(node* n){
+        int ret = n->elem;
         node* pred = n->prev;
         node* succ = n->next;
         pred->next = succ;
         succ->prev = pred;
-        int removedNum = n->elem;
         free(n);
         size--;
-        return removedNum;
+        return ret;
+
     }
 
 public:
 
     LinkedList(){
-        head = new node;  //header
-        tail = new node;  //trailer
-        size = 0;
+        head = new node;
+        tail = new node;
         head->next = tail;
         tail->prev = head;
+        size = 0;
     }
 
     void addTail(int elem){
