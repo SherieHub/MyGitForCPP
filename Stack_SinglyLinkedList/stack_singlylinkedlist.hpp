@@ -10,23 +10,23 @@ class StackLinkedList: public Stack{
         list = new LinkedList();
     }
     
-    void push(int num){
+    void push(int num){ // T(n) = 14
         list->addHead(num);
     }
     
-    int pop(){
+    int pop(){  // T(n) = 11
         return list->removeHead();
     }
     
-    int top(){
+    int top(){ // T(n) = 6
         return isEmpty() ? -1 : list->head->elem;
     }
     
-    int sizeList(){
+    int sizeList(){ // T(n) = 2
         return list->getSize();
     }
     
-    bool isEmpty(){
+    bool isEmpty(){ //T(n) = 3
         return list->getSize() == 0;
     }
 };

@@ -16,7 +16,7 @@ class LinkedList: public List{
         size = 0;
     }
     
-    void addHead(int num){
+    void addHead(int num){ // T(n) = 12
         node* n = (node*)calloc(1, sizeof(node));
         n->elem = num;
         
