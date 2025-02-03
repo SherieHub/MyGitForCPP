@@ -18,7 +18,6 @@ class SinglyLinkedList : public List{
     void addHead(int num){
         node* n = new node;
         n->elem = num;
-        
         if(!head){
             head = n;
             tail = head;
@@ -32,7 +31,6 @@ class SinglyLinkedList : public List{
     void addTail(int num){
         node* n = new node;
         n->elem = num;
-        
         if(!head){
             head = n;
             tail = head;
@@ -45,7 +43,6 @@ class SinglyLinkedList : public List{
     
     void addAt(int num, int pos){
         if(pos < 1 || pos > size + 1) return;
-        
         if(pos == 1){
             addHead(num);
         }else if(pos == size + 1){
@@ -58,7 +55,6 @@ class SinglyLinkedList : public List{
             for(int i = 1; i < pos-1; i++){
                 curr = curr->next;
             }
-            
             n->next = curr->next;
             curr->next = n;
             
@@ -68,10 +64,8 @@ class SinglyLinkedList : public List{
 
     int removeHead(){
         if(!head) return -1;
-        
         node* temp = head;
         int ret = head->elem;
-        
         if(size == 1){
             head = nullptr;
             tail = nullptr;
@@ -85,11 +79,9 @@ class SinglyLinkedList : public List{
     
     int removeTail(){
         if(!head) return -1;
-        
         node* curr = head;
         node* prev = nullptr;
         int ret = tail->elem;
-            
         if(size == 1){
             head = nullptr;
             tail = nullptr;
@@ -109,7 +101,6 @@ class SinglyLinkedList : public List{
     int removeAt(int pos){
         if(!head) return -1;
         if(pos < 1 || pos > size) return -1;
-        
         if(pos == 1){
             return removeHead();
         }else if(pos == size){
@@ -141,7 +132,6 @@ class SinglyLinkedList : public List{
     void print(){
         cout << "SINGLYLINKEDLIST: ";
         node* curr = head;
-        
         while(curr){
             cout << curr->elem;
             if(curr->next != NULL){

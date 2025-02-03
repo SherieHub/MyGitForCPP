@@ -1,10 +1,10 @@
 package GenericLinkedList;
 
-class Node<T> {
+class SinglyNode<T> {
     T data;
-    Node<T> next;
+    SinglyNode<T> next;
 
-    Node(T data) {
+    SinglyNode(T data) {
         this.data = data;
         this.next = null;
     }
