@@ -12,13 +12,12 @@ public class MyArrayList<E> {
             _size--;
             throw new ArrayFullException("The array is full and " + num + " cannot be inserted.");
         }
-
     }
 
     public void addAt(E num, int pos) throws InvalidPositionException, ArrayFullException {
-        if (pos < 1 || pos -1 > _size) throw new InvalidPositionException("Position must be between 1 and " + capacity);
+        if (pos < 1 || pos > _size+1) throw new InvalidPositionException("Position must be between 1 and " + capacity);
         if (_size >= capacity) throw new ArrayFullException("The array is full and " + num + " cannot be inserted.");
-        for (int i = _size; i > pos -1; i--) {
+        for(int i = _size; i > pos-1; i--){
             array[i] = array[i-1];
         }
         array[pos-1] = num;
@@ -26,9 +25,9 @@ public class MyArrayList<E> {
     }
 
     public boolean remove(E num) {
-        for (int i = 0; i < _size; i++) {
-            if (array[i] == num) {
-                for (int j = i; j < _size-1; j++) {
+        for(int i = 0 ;i < _size; i++){
+            if(array[i] == num){
+                for(int j = i; j < _size-1; j++){
                     array[j] = array[j+1];
                 }
                 _size--;
