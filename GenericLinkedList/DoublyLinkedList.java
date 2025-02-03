@@ -48,6 +48,10 @@ public class DoublyLinkedList <T>{
     public void addAt(T data, int pos) throws InvalidPositionException{
         if(pos < 1 || pos > size+1){ throw new InvalidPositionException("Invalid position"); }
         DoublyNode<T> curr = head.next;
+        if(pos == 1){
+            addHead(data);
+            return;
+        }
         for(int i = 1; i < pos; i++){
             curr = curr.next;
         }
@@ -93,7 +97,8 @@ public class DoublyLinkedList <T>{
         return size;
     }
 
-    public T get(int pos){
+    public T get(int pos) throws InvalidPositionException{
+        if(pos < 1 || pos > size)throw new InvalidPositionException("Invalid position");
         DoublyNode<T> curr = head.next;
         for(int i = 1; i < pos; i++){
             curr = curr.next;

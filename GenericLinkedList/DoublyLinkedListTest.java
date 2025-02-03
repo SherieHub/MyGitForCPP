@@ -1,237 +1,307 @@
 package GenericLinkedList;
 
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import ArrayList.InvalidPositionException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class DoublyLinkedListTest {
+import java.util.NoSuchElementException;
+import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class DoublyLinkedListTest {
+
     private DoublyLinkedList<Integer> list;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         list = new DoublyLinkedList<>();
     }
 
     @Test
-    public void testInitialState() {
-        assertTrue("New list should be empty", list.isEmpty());
-        assertEquals("Initial size should be 0", 0, list.getSize());
-    }
-
-    @Test(expected = NoSuchElementException.class)
-    public void testRemoveFirstEmptyList() {
-        list.removeFirst();
-    }
-
-    @Test(expected = NoSuchElementException.class)
-    public void testRemoveLastEmptyList() {
-        list.removeLast();
+    void testIsEmptyInitially() {
+        // Newly constructed list should be empty.
+        assertTrue(list.isEmpty(), "List should be empty initially");
     }
 
     @Test
-    public void testAddHeadToEmptyList() {
-        list.addHead(5);
-        assertFalse("List shouldn't be empty", list.isEmpty());
-        assertEquals("Size should be 1", 1, list.getSize());
-        assertEquals("Remove first should return added item",
-                Integer.valueOf(5), list.removeFirst());
-    }
-
-    @Test
-    public void testAddLastToEmptyList() {
-        list.addLast(7);
-        assertEquals("Size should be 1", 1, list.getSize());
-        assertEquals("Remove last should return added item",
-                Integer.valueOf(7), list.removeLast());
-    }
-
-    @Test
-    public void testMultipleAddHeadOperations() {
-        list.addHead(1);
-        list.addHead(2);
-        list.addHead(3);
-        assertEquals("Size should be 3", 3, list.getSize());
-        assertEquals("First remove should get last added head",
-                Integer.valueOf(3), list.removeFirst());
-        assertEquals("Second remove should get middle item",
-                Integer.valueOf(2), list.removeFirst());
-        assertEquals("Last remove should get first added item",
-                Integer.valueOf(1), list.removeFirst());
-    }
-
-    @Test
-    public void testMultipleAddLastOperations() {
-        list.addLast(10);
-        list.addLast(20);
-        list.addLast(30);
-        assertEquals("Size should be 3", 3, list.getSize());
-        assertEquals("First removeLast should get 30",
-                Integer.valueOf(30), list.removeLast());
-        assertEquals("Second removeLast should get 20",
-                Integer.valueOf(20), list.removeLast());
-        assertEquals("Last removeLast should get 10",
-                Integer.valueOf(10), list.removeLast());
-    }
-
-    @Test
-    public void testSimultaneousHeadAndTailOperations() {
-        list.addHead(100);
-        list.addLast(200);
-        list.addHead(300);
-        list.addLast(400);
-
-        assertEquals("Size should be 4", 4, list.getSize());
-        assertEquals("First removeFirst should return 300",
-                Integer.valueOf(300), list.removeFirst());
-        assertEquals("First removeLast should return 400",
-                Integer.valueOf(400), list.removeLast());
-        assertEquals("Second removeFirst should return 100",
-                Integer.valueOf(100), list.removeFirst());
-        assertEquals("Second removeLast should return 200",
-                Integer.valueOf(200), list.removeLast());
-    }
-
-    @Test
-    public void testStructuralIntegrityAfterRemoval() {
-        list.addHead(1);
-        list.addLast(2);
-        list.addLast(3);
-
-        // Remove middle element via removeFirst
-        assertEquals(Integer.valueOf(1), list.removeFirst());
-        assertEquals("Size should be 2", 2, list.getSize());
-        assertEquals("Next removeFirst should return 2",
-                Integer.valueOf(2), list.removeFirst());
-        assertEquals("Final removeLast should return 3",
-                Integer.valueOf(3), list.removeLast());
-    }
-
-    @Test
-    public void testAlternatingAddRemoveOperations() {
-        list.addHead(5);
-        list.removeLast();
-        assertTrue("List should be empty", list.isEmpty());
-
-        list.addLast(10);
+    void testAddHead() {
+        list.addHead(10);
         list.addHead(20);
-        assertEquals("Size should be 2", 2, list.getSize());
-        assertEquals(Integer.valueOf(20), list.removeFirst());
-        assertEquals(Integer.valueOf(10), list.removeLast());
+        // After adding 20 at head then 10 becomes second.
+        assertEquals(2, list.getSize(), "List size should be 2 after two addHead calls");
+        assertEquals(20, list.get(1), "First element should be the last added (20)");
+        assertEquals(10, list.get(2), "Second element should be 10");
     }
 
     @Test
-    public void testLargeNumberOfElements() {
-        int testSize = 10000;
-        for (int i = 0; i < testSize; i++) {
-            if (i % 2 == 0) list.addHead(i);
-            else list.addLast(i);
-        }
-
-        assertEquals("Size should match number of added elements",
-                testSize, list.getSize());
-
-        for (int i = testSize - 1; i >= 0; i--) {
-            if (i % 2 != 0) assertEquals(Integer.valueOf(i), list.removeLast());
-            else assertEquals(Integer.valueOf(i), list.removeFirst());
-        }
-
-        assertTrue("List should be empty after all removals", list.isEmpty());
+    void testAddLast() {
+        list.addLast(30);
+        list.addLast(40);
+        // List should preserve insertion order.
+        assertEquals(2, list.getSize(), "List size should be 2 after two addLast calls");
+        assertEquals(30, list.get(1), "First element should be 30");
+        assertEquals(40, list.get(2), "Second element should be 40");
     }
 
     @Test
-    public void testNullHandling() {
-        list.addHead(null);
-        list.addLast(null);
-        assertEquals("Size should be 2", 2, list.getSize());
-        assertNull("First null should be removed", list.removeFirst());
-        assertNull("Last null should be removed", list.removeLast());
+    void testAddAt() throws InvalidPositionException {
+        // Build initial list: addHead and addLast
+        list.addHead(10);  // list: 10
+        list.addLast(30);  // list: 10, 30
+        // Insert in the middle
+        list.addAt(20, 2); // list should become: 10, 20, 30
+
+        assertEquals(3, list.getSize(), "List size should be 3 after addAt in the middle");
+        assertEquals(10, list.get(1));
+        assertEquals(20, list.get(2));
+        assertEquals(30, list.get(3));
+
+        // Insert at the beginning using addAt
+        list.addAt(5, 1); // list: 5, 10, 20, 30
+        assertEquals(5, list.get(1), "New element 5 should be at position 1");
+
+        // Attempting to add at an invalid position should throw an exception.
+        assertThrows(InvalidPositionException.class, () -> list.addAt(100, 0),
+                "Adding at position 0 should throw an InvalidPositionException");
+        // Valid positions for a list of size 4 are 1 to 5.
+        assertThrows(InvalidPositionException.class, () -> list.addAt(100, 6),
+                "Adding beyond size+1 should throw an InvalidPositionException");
     }
 
     @Test
-    public void testAddAt(){
-        list.addHead(1);
-        list.addAt(3,1);
-        assertEquals(Integer.valueOf(3), list.get(1));
+    void testRemoveFirst() {
+        // Create a list and remove the first element repeatedly.
+        list.addLast(100);
+        list.addLast(200);
+        list.addLast(300);
+
+        int removed = list.removeFirst();
+        assertEquals(100, removed, "removeFirst should return the first element (100)");
+        assertEquals(2, list.getSize(), "List size should be reduced after removeFirst");
+
+        // Remove remaining elements.
+        list.removeFirst();
+        list.removeFirst();
+        assertTrue(list.isEmpty(), "List should be empty after removing all elements");
+
+        // Removing from an empty list should throw an exception.
+        assertThrows(NoSuchElementException.class, () -> list.removeFirst(),
+                "removeFirst on an empty list should throw NoSuchElementException");
     }
 
     @Test
-    public void testAddAtException(){
-        list.addHead(1);
-        list.addAt(3,1);
-        assertEquals(Integer.valueOf(3), list.get(1));
+    void testRemoveLast() {
+        // Create a list and remove the last element repeatedly.
+        list.addHead(400);
+        list.addHead(500);
+        list.addHead(600);  // List now: 600, 500, 400
+
+        int removed = list.removeLast();
+        assertEquals(400, removed, "removeLast should return the last element (400)");
+        assertEquals(2, list.getSize(), "List size should be reduced after removeLast");
+
+        // Remove remaining elements.
+        list.removeLast();
+        list.removeLast();
+        assertTrue(list.isEmpty(), "List should be empty after removing all elements");
+
+        // Removing from an empty list should throw an exception.
+        assertThrows(NoSuchElementException.class, () -> list.removeLast(),
+                "removeLast on an empty list should throw NoSuchElementException");
     }
 
     @Test
-    public void testStringTypeHandling() {
+    void testMixedOperations() throws InvalidPositionException {
+        // Start with an empty list and perform a mixture of operations.
+        list.addLast(1);     // list: 1
+        list.addHead(0);     // list: 0, 1
+        list.addAt(5, 3);    // list: 0, 1, 5
+        list.addAt(2, 2);    // list: 0, 2, 1, 5
+        list.addLast(10);    // list: 0, 2, 1, 5, 10
+        list.addHead(-1);    // list: -1, 0, 2, 1, 5, 10
+
+        assertEquals(6, list.getSize(), "List size should be 6 after a series of mixed operations");
+
+        // Verify the order.
+        assertEquals(-1, list.get(1));
+        assertEquals(0, list.get(2));
+        assertEquals(2, list.get(3));
+        assertEquals(1, list.get(4));
+        assertEquals(5, list.get(5));
+        assertEquals(10, list.get(6));
+
+        // Now remove from both ends.
+        int firstRemoved = list.removeFirst(); // should remove -1
+        int lastRemoved = list.removeLast();   // should remove 10
+        assertEquals(-1, firstRemoved, "First element removed should be -1");
+        assertEquals(10, lastRemoved, "Last element removed should be 10");
+        assertEquals(4, list.getSize(), "List size should be 4 after two removals");
+
+        // Verify the remaining order.
+        assertEquals(0, list.get(1));
+        assertEquals(2, list.get(2));
+        assertEquals(1, list.get(3));
+        assertEquals(5, list.get(4));
+    }
+
+    @Test
+    void testGenericTypeWithStrings() throws InvalidPositionException {
+        // Create a list of strings to verify that the generic works correctly.
         DoublyLinkedList<String> stringList = new DoublyLinkedList<>();
-        stringList.addHead("World");
-        stringList.addLast("Hello");
-        assertEquals("First removal should be 'World'",
-                "World", stringList.removeFirst());
-        assertEquals("Last removal should be 'Hello'",
-                "Hello", stringList.removeLast());
+        stringList.addHead("apple");
+        stringList.addLast("banana");
+        stringList.addAt("cherry", 2);  // list should be: apple, cherry, banana
+
+        assertEquals(3, stringList.getSize(), "String list size should be 3");
+        assertEquals("apple", stringList.get(1));
+        assertEquals("cherry", stringList.get(2));
+        assertEquals("banana", stringList.get(3));
     }
 
+    // ===================== Additional Harder Tests =====================
+
     @Test
-    public void testConsecutiveRemovals() {
-        list.addHead(1);
+    void testGetInvalidPosition() {
+        list.addLast(1);
         list.addLast(2);
-        list.addHead(0);
-
-        assertEquals(Integer.valueOf(0), list.removeFirst());
-        assertEquals(Integer.valueOf(2), list.removeLast());
-        assertEquals(Integer.valueOf(1), list.removeFirst());
-
-        assertTrue("List should be empty", list.isEmpty());
-        assertEquals("Size should be 0", 0, list.getSize());
+        // Attempt to get elements at invalid positions.
+        // Assuming that get() throws an InvalidPositionException on invalid indices.
+        assertThrows(InvalidPositionException.class, () -> list.get(0), "Position 0 is invalid");
+        assertThrows(InvalidPositionException.class, () -> list.get(-1), "Negative position is invalid");
+        assertThrows(InvalidPositionException.class, () -> list.get(3), "Position beyond list size is invalid");
     }
 
     @Test
-    public void testSingleElementBehavior() {
-        list.addHead(42);
-        assertEquals("Single element removeLast",
-                Integer.valueOf(42), list.removeLast());
-        assertTrue("List should be empty", list.isEmpty());
+    void testRemoveSingleElement() {
+        // Add and then remove a single element from both ends.
+        list.addHead(99);
+        assertEquals(99, list.removeFirst(), "Single element removed from head should be 99");
+        assertTrue(list.isEmpty(), "List should be empty after removal");
 
-        list.addLast(37);
-        assertEquals("Single element removeFirst",
-                Integer.valueOf(37), list.removeFirst());
-        assertTrue("List should be empty", list.isEmpty());
+        list.addLast(77);
+        assertEquals(77, list.removeLast(), "Single element removed from tail should be 77");
+        assertTrue(list.isEmpty(), "List should be empty after removal");
     }
 
     @Test
-    public void testBidirectionalTraversal() {
-        list.addHead(1);
-        list.addLast(2);
-        list.addLast(3);
-        list.addHead(0);
+    void testDuplicates() throws InvalidPositionException {
+        // Add duplicate elements and remove one of them.
+        list.addLast(42);
+        list.addLast(42);
+        list.addLast(42);
+        assertEquals(3, list.getSize(), "List should contain three elements");
+        assertEquals(42, list.get(1));
+        assertEquals(42, list.get(2));
+        assertEquals(42, list.get(3));
 
-        assertEquals("RemoveFirst(0)", Integer.valueOf(0), list.removeFirst());
-        assertEquals("RemoveLast(3)", Integer.valueOf(3), list.removeLast());
-        assertEquals("RemoveFirst(1)", Integer.valueOf(1), list.removeFirst());
-        assertEquals("RemoveLast(2)", Integer.valueOf(2), list.removeLast());
+        // Remove one element and verify that duplicates remain.
+        list.removeFirst();
+        assertEquals(2, list.getSize(), "List should contain two elements after removal");
+        assertEquals(42, list.get(1));
+        assertEquals(42, list.get(2));
     }
 
     @Test
-    public void testSizeConsistency() {
-        for (int i = 0; i < 100; i++) {
-            if (i % 3 == 0) {
-                list.addHead(i);
-            } else {
-                list.addLast(i);
-            }
-            assertEquals("Size should increment correctly", i + 1, list.getSize());
+    void testAddAtBoundary() throws InvalidPositionException {
+        // When the list is empty, adding at position 1 should work.
+        list.addAt(100, 1);
+        assertEquals(1, list.getSize(), "List size should be 1 after adding at position 1");
+        assertEquals(100, list.get(1));
+
+        // When the list has one element, adding at position 2 (append) should work.
+        list.addAt(200, 2);
+        assertEquals(2, list.getSize(), "List size should be 2 after appending at position 2");
+        assertEquals(200, list.get(2));
+    }
+
+    @Test
+    void testStressOperations() throws InvalidPositionException {
+        // Test the list with a large number of operations.
+        int count = 1000;
+        for (int i = 1; i <= count; i++) {
+            list.addLast(i);
+        }
+        assertEquals(count, list.getSize(), "List size should match number of added elements");
+
+        // Verify the order.
+        for (int i = 1; i <= count; i++) {
+            assertEquals(i, list.get(i), "Element at position " + i + " should be " + i);
         }
 
-        for (int i = 99; i >= 0; i--) {
+        // Remove half the elements from the front.
+        for (int i = 1; i <= count / 2; i++) {
+            list.removeFirst();
+        }
+        assertEquals(count - count / 2, list.getSize(), "List size should be halved after removals");
+
+        // Remove remaining elements from the back.
+        while (!list.isEmpty()) {
+            list.removeLast();
+        }
+        assertTrue(list.isEmpty(), "List should be empty after all removals");
+    }
+
+    @Test
+    void testAlternateAddRemove() throws InvalidPositionException {
+        // Alternate adding and removing from head and tail.
+        for (int i = 0; i < 50; i++) {
+            list.addHead(i);
             if (i % 2 == 0) {
-                list.removeFirst();
-            } else {
                 list.removeLast();
+            } else {
+                list.removeFirst();
             }
-            assertEquals("Size should decrement correctly", i, list.getSize());
+        }
+        // Since the operations are alternating, we don't know the exact contents,
+        // but we can remove the remaining elements to ensure consistency.
+        int remaining = list.getSize();
+        for (int i = 0; i < remaining; i++) {
+            list.removeFirst();
+        }
+        assertTrue(list.isEmpty(), "List should be empty after alternating operations and removals");
+    }
+
+    @Test
+    void testRandomOperations() throws InvalidPositionException {
+        // Perform a series of random operations to simulate unpredictable usage.
+        Random rand = new Random();
+        int operations = 500;
+        int currentSize = 0;
+
+        for (int i = 0; i < operations; i++) {
+            int op = rand.nextInt(4);
+            switch (op) {
+                case 0:
+                    // addHead
+                    list.addHead(i);
+                    currentSize++;
+                    break;
+                case 1:
+                    // addLast
+                    list.addLast(i);
+                    currentSize++;
+                    break;
+                case 2:
+                    // removeFirst
+                    if (!list.isEmpty()) {
+                        list.removeFirst();
+                        currentSize--;
+                    } else {
+                        assertThrows(NoSuchElementException.class, () -> list.removeFirst());
+                    }
+                    break;
+                case 3:
+                    // removeLast
+                    if (!list.isEmpty()) {
+                        list.removeLast();
+                        currentSize--;
+                    } else {
+                        assertThrows(NoSuchElementException.class, () -> list.removeLast());
+                    }
+                    break;
+            }
+            assertEquals(currentSize, list.getSize(), "List size should be consistent with operations count");
         }
     }
 }
