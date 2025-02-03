@@ -130,7 +130,6 @@ class DoublyLinkedList : public List{
         
         cout << endl << "SIZE: " << size << endl << endl;
     }
-    
 };
 
 
