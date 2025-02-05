@@ -44,12 +44,11 @@ class LinkedList: public List{
     
     int get(int pos){
         node* curr = head;
-        int ctr = 1;
         
-        while(curr != NULL && ctr != pos){
+        for(int i = 1; i < pos; i++){
             curr = curr->next;
-            ctr++;
         }
+        
         return curr->elem;
     }
     
