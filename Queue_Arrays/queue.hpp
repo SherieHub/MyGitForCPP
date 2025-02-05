@@ -16,7 +16,7 @@ class Queue{
     }
     
     //addLast
-    void enqueue(int num){ 
+    void enqueue(int num){ //T(n) = 3
         if(size == 5) throw logic_error("Queue is Full!");
         arr[size++] = num;
     }

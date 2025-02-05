@@ -13,23 +13,23 @@ class Queue_SinglyLinkedList : public Queue{
         list = new SinglyLinkedList();
     }
     
-    void enqueue(int num){
+    void enqueue(int num){ //T(n) = 12
         list->addTail(num);
     }
     
-    int dequeue(){
+    int dequeue(){ // T(n) = 14
         return isEmpty() ? -1 : list->removeHead();
     }
     
-    int first(){
+    int first(){ //T(n) = 6
         return isEmpty() ? -1 : list->head->elem;
     }
     
-    int _size(){
+    int _size(){ //T(n) = 2
         return list->_size();
     }
     
-    bool isEmpty(){
+    bool isEmpty(){ //T(n) = 3
         return list->_size() == 0;
     }
 };

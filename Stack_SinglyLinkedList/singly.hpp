@@ -16,7 +16,7 @@ class LinkedList: public List{
         size = 0;
     }
     
-    void addHead(int num){
+    void addHead(int num){ // T(n) = 12
         node* n = (node*)calloc(1, sizeof(node));
         n->elem = num;
         
@@ -30,7 +30,7 @@ class LinkedList: public List{
         size++;
     }
     
-    int removeHead(){
+    int removeHead(){ // T(n) = 9
         if(!head) return -1;
         
         node* temp = head;
@@ -42,10 +42,14 @@ class LinkedList: public List{
         return removedNum;
     }
     
-    int get(int pos){
+    int get(int pos){ //T(n) =
         node* curr = head;
+<<<<<<< HEAD
         
         for(int i = 1; i < pos; i++){
+=======
+        for (int i = 1; i < pos; i++) {
+>>>>>>> 699068edbef174ec0ab845b475686dffc7bd8948
             curr = curr->next;
         }
         

@@ -17,7 +17,7 @@ class SinglyLinkedList: public List{
         size = 0;
     }
     
-    void addTail(int num){
+    void addTail(int num){ // T(n) = 10
         node* n = new node;
         n->elem = num;
         
@@ -31,25 +31,22 @@ class SinglyLinkedList: public List{
         size++;
     }
     
-    int removeHead(){
+    int removeHead(){ // T(n) = 8
         node* temp = head;
         int ret = head->elem;
-        
         head = head->next;
         delete temp;
         size--;
-        
         return ret;
     }
     
-   int _size(){
+   int _size(){ // T(n) = 1
        return size;
    }
    
    void print(){
        cout << "SinglyLinkedList: ";
        node* curr = head;
-       
        while(curr){
            cout << curr->elem;
            if(curr->next != nullptr){

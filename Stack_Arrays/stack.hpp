@@ -16,7 +16,6 @@ class Stack{
     }
     
     public:
-    
     void push(int num){
         if(size == 5) throw logic_error("Stack is Full!");
         arr[size++] = num;
