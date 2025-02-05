@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/MyGitForCPP.iml" filepath="$PROJECT_DIR$/.idea/MyGitForCPP.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MyGitForCPP2.iml" filepath="$PROJECT_DIR$/.idea/MyGitForCPP2.iml" />
     </modules>
   </component>
 </project>
