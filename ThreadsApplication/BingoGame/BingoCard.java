@@ -1,15 +1,13 @@
 package ThreadsApplication.BingoGame;
-
 import java.util.*;
-
-import java.util.*;
-
 class BingoCard {
     private int[][] card;
     private boolean[][] marked;
     private static final int SIZE = 5;
+    private int id;
 
-    public BingoCard() {
+    public BingoCard(int id) {
+        this.id = id;
         generateCard();
     }
 
@@ -55,5 +53,24 @@ class BingoCard {
     public int[][] getCard() {
         return card;
     }
-}
 
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (card[row][col] == 0) {
+                    sb.append("FREE").append("\t");
+                } else {
+                    sb.append(card[row][col]).append("\t");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+}

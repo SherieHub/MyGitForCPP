@@ -3,54 +3,67 @@ import java.util.*;
 
 class BingoGame {
     private List<BingoCard> cards;
-    private Set<Integer> calledNumbers;
+    private boolean[] calledNumbers;
     private Random random;
-    private boolean gameOver;
+    private boolean bingo;
 
     public BingoGame(int numPlayers) {
         cards = new ArrayList<>();
         for (int i = 0; i < numPlayers; i++) {
-            cards.add(new BingoCard());
+            cards.add(new BingoCard(i + 1));
         }
-        calledNumbers = new HashSet<>();
+        calledNumbers = new boolean[76];
+        calledNumbers[0] = true; // FREE space
         random = new Random();
-        gameOver = false;
-    }
-
-    public synchronized void stopGame() {
-        gameOver = true;
+        bingo = false;
     }
 
     public void play() {
-        while (!gameOver) {
+        List<Thread> threads = new ArrayList<>();
+        for (BingoCard card : cards) {
+            threads.add(new Thread(new BingoPatternPlus(card, card.getId())));
+            threads.add(new Thread(new BingoPatternHash(card, card.getId())));
+        }
+
+        for (Thread thread : threads) {
+            thread.start();
+        }
+
+        while (!bingo) {
             int num;
             do {
                 num = random.nextInt(75) + 1;
-            } while (calledNumbers.contains(num));
-            calledNumbers.add(num);
+            } while (calledNumbers[num]);
+            calledNumbers[num] = true;
             System.out.println("Number called: " + num);
 
-            for (int i = 0; i < cards.size(); i++) {
-                cards.get(i).markNumber(num);
+            for (BingoCard card : cards) {
+                card.markNumber(num);
             }
 
-            checkBingo();
+            System.out.print("Numbers called: ");
+            for (int i = 1; i <= 75; i++) {
+                if (calledNumbers[i]) {
+                    System.out.print(i + " ");
+                }
+            }
+            System.out.println();
+
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
                 break;
             }
         }
-    }
 
-    private void checkBingo() {
-        for (int i = 0; i < cards.size(); i++) {
-            BingoCard card = cards.get(i);
-            for (int j = 0; j < 5; j++) {
-                new Thread(new BingoRowChecker(card, j, i + 1, this)).start();
-                new Thread(new BingoColumnChecker(card, j, i + 1, this)).start();
-            }
+        for (Thread thread : threads) {
+            thread.interrupt();
         }
     }
+
+    public boolean declareBingo() {
+        return bingo = true;
+    }
 }
+
 
