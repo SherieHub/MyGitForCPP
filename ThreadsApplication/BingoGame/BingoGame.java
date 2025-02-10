@@ -6,6 +6,7 @@ class BingoGame {
     private boolean[] calledNumbers;
     private Random random;
     private boolean bingo;
+    private List<Thread> threads;
 
     public BingoGame(int numPlayers) {
         cards = new ArrayList<>();
@@ -16,19 +17,22 @@ class BingoGame {
         calledNumbers[0] = true; // FREE space
         random = new Random();
         bingo = false;
+        threads = new ArrayList<>();
     }
 
     public void play() {
-        List<Thread> threads = new ArrayList<>();
+        // Create threads for pattern checkers
         for (BingoCard card : cards) {
-            threads.add(new Thread(new BingoPatternPlus(card, card.getId())));
-            threads.add(new Thread(new BingoPatternHash(card, card.getId())));
+            threads.add(new Thread(new BingoPatternPlus(card, card.getId(), this)));
+            threads.add(new Thread(new BingoPatternHash(card, card.getId(), this)));
         }
 
+        // Start all threads
         for (Thread thread : threads) {
             thread.start();
         }
 
+        // Main game loop
         while (!bingo) {
             int num;
             do {
@@ -37,10 +41,12 @@ class BingoGame {
             calledNumbers[num] = true;
             System.out.println("Number called: " + num);
 
+            // Mark the number on all cards
             for (BingoCard card : cards) {
                 card.markNumber(num);
             }
 
+            // Print all called numbers
             System.out.print("Numbers called: ");
             for (int i = 1; i <= 75; i++) {
                 if (calledNumbers[i]) {
@@ -49,6 +55,7 @@ class BingoGame {
             }
             System.out.println();
 
+            // Sleep for 0.3 seconds
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
@@ -56,14 +63,19 @@ class BingoGame {
             }
         }
 
+        // Interrupt all threads when bingo is declared
         for (Thread thread : threads) {
             thread.interrupt();
         }
     }
 
-    public boolean declareBingo() {
-        return bingo = true;
+    public synchronized void declareBingo() {
+        bingo = true;
+        System.out.println("BINGO! Game over.");
+    }
+
+    public boolean isBingo() {
+        return bingo;
     }
 }
-
 

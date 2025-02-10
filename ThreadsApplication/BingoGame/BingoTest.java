@@ -12,7 +12,7 @@ class BingoTest {
 
     @BeforeEach
     void setUp() {
-        game = new BingoGame(1);
+        game = new BingoGame(1); // Initialize game with 1 player
         card = new BingoCard(1); // Pass card ID to constructor
     }
 
@@ -46,21 +46,21 @@ class BingoTest {
     @Test
     void testBingoRowChecker() {
         for (int col = 0; col < 5; col++) {
-            card.markNumber(card.getCard()[2][col]);
+            card.markNumber(card.getCard()[2][col]); // Mark all numbers in the middle row
         }
-        BingoRowChecker checker = new BingoRowChecker(card, 2, 1);
+        BingoRowChecker checker = new BingoRowChecker(card, 2, 1, game);
         checker.run();
-        assertTrue(game.declareBingo(), "Game should be stopped when row is completed");
+        assertTrue(game.isBingo(), "Game should be stopped when row is completed");
     }
 
     @Test
     void testBingoColumnChecker() {
         for (int row = 0; row < 5; row++) {
-            card.markNumber(card.getCard()[row][3]);
+            card.markNumber(card.getCard()[row][3]); // Mark all numbers in the fourth column
         }
-        BingoColumnChecker checker = new BingoColumnChecker(card, 3, 1);
+        BingoColumnChecker checker = new BingoColumnChecker(card, 3, 1, game);
         checker.run();
-        assertTrue(game.declareBingo(), "Game should be stopped when column is completed");
+        assertTrue(game.isBingo(), "Game should be stopped when column is completed");
     }
 
     @Test
@@ -69,9 +69,9 @@ class BingoTest {
             card.markNumber(card.getCard()[2][i]); // Mark middle row
             card.markNumber(card.getCard()[i][2]); // Mark middle column
         }
-        BingoPatternPlus patternPlus = new BingoPatternPlus(card, 1);
+        BingoPatternPlus patternPlus = new BingoPatternPlus(card, 1, game);
         patternPlus.run();
-        assertTrue(game.declareBingo(), "Game should be stopped when plus pattern is completed");
+        assertTrue(game.isBingo(), "Game should be stopped when plus pattern is completed");
     }
 
     @Test
@@ -82,19 +82,14 @@ class BingoTest {
             card.markNumber(card.getCard()[i][1]); // Mark second column
             card.markNumber(card.getCard()[i][3]); // Mark fourth column
         }
-        BingoPatternHash patternHash = new BingoPatternHash(card, 1);
+        BingoPatternHash patternHash = new BingoPatternHash(card, 1, game);
         patternHash.run();
-        assertTrue(game.declareBingo(), "Game should be stopped when hash pattern is completed");
+        assertTrue(game.isBingo(), "Game should be stopped when hash pattern is completed");
     }
 
-    private boolean gameOver(BingoGame game) {
-        try {
-            java.lang.reflect.Field field = BingoGame.class.getDeclaredField("bingo");
-            field.setAccessible(true);
-            return field.getBoolean(game);
-        } catch (Exception e) {
-            fail("Failed to access bingo field");
-            return false;
-        }
+    @Test
+    void testGameOver() {
+        game.declareBingo(); // Manually declare bingo
+        assertTrue(game.isBingo(), "Game should be over when bingo is declared");
     }
 }

@@ -4,11 +4,13 @@ import java.util.*;
 abstract class BingoPattern implements Runnable {
     protected BingoCard card;
     protected int cardId;
+    protected BingoGame game;
     protected List<Thread> checkers;
 
-    public BingoPattern(BingoCard card, int cardId) {
+    public BingoPattern(BingoCard card, int cardId, BingoGame game) {
         this.card = card;
         this.cardId = cardId;
+        this.game = game;
         this.checkers = new ArrayList<>();
     }
 
@@ -26,8 +28,12 @@ abstract class BingoPattern implements Runnable {
             }
         }
 
-        System.out.println("Card " + cardId + " completes pattern!");
-        System.out.println(card);
-        Thread.currentThread().interrupt();
+        // Declare bingo if the pattern is completed
+        if (!game.isBingo()) {
+            game.declareBingo();
+            System.out.println("Card " + cardId + " completes pattern!");
+            System.out.println(card);
+        }
     }
 }
+
