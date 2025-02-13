@@ -1,6 +1,6 @@
 package Bingo_Game;
-
 import java.util.*;
+
 public class BingoGame implements Runnable{
     private final boolean[] result = new boolean[76];
     private volatile boolean isBingo = false;
@@ -20,15 +20,33 @@ public class BingoGame implements Runnable{
         }
 
         List<Thread> threads = new ArrayList<>();
-        for (BingoCard card : cards) {
-            threads.add(new Thread(new BingoPatternPlus(card, this)));
-        }
 
-        for (BingoCard card : cards) {
-            threads.add(new Thread(new BingoPatternHash(card, this)));
-        }
+        boolean validChoice = false;
 
-        for (Thread t : threads) {
+        do {
+            System.out.print("Enter type of pattern (1 - PatternPlus || 2 - PatternHash): ");
+            int type = sc.nextInt();
+
+            switch (type) {
+                case 1:
+                    for (BingoCard card : cards) {
+                        threads.add(new Thread(new BingoPatternPlus(card, this)));
+                    }
+                    validChoice = true;
+                    break;
+                case 2:
+                    for (BingoCard card : cards) {
+                        threads.add(new Thread(new BingoPatternHash(card, this)));
+                    }
+                    validChoice = true;
+                    break;
+                default:
+                    System.out.println("Invalid type! Try again.");
+            }
+        } while (!validChoice);
+
+
+        for(Thread t : threads) {
             t.start();
         }
 

@@ -1,7 +1,7 @@
 package Bingo_Game;
 import java.util.*;
 
-class BingoColumnChecker extends BingoChecker{
+public class BingoColumnChecker extends BingoChecker{
     private final int col;
 
     public BingoColumnChecker(BingoCard card, BingoGame game, int col) {
@@ -12,7 +12,8 @@ class BingoColumnChecker extends BingoChecker{
     @Override
     public void run() {
         try {
-            for (int num : card.getCard()[col]) {
+            for (int i = 0; i < 5; i++) {
+                int num = card.getCard()[i][col];
                 if (num != 0) {
                     synchronized (game) {
                         while (!game.isNumberChosen(num) && !game.isBingo()) {
