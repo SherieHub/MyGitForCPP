@@ -25,13 +25,12 @@ public:
     }
 
     void resizeChildren(node* p){
-        p->children = (node**)realloc(p->children, p->num_child, sizeof(node*));
+        p->children = (node**)realloc(p->children, p->num_child* sizeof(node*));
     }
 
     node* addRoot(int num) {
         if (root) throw logic_error("Root already exists");
-
-        root = (node**)malloc(1, sizeof(node*));
+        root = create_node(num);
         root->elem = num;
         size++;
 
@@ -39,7 +38,7 @@ public:
     }
 
     node* addChild(node* p, int num)  {
-        node* n = create_node(e);
+        node* n = create_node(num);
 
         p->num_child++;
         resizeChildren(p);
