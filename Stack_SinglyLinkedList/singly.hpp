@@ -44,9 +44,15 @@ class LinkedList: public List{
     
     int get(int pos){ //T(n) =
         node* curr = head;
+<<<<<<< HEAD
+        
+        for(int i = 1; i < pos; i++){
+=======
         for (int i = 1; i < pos; i++) {
+>>>>>>> 699068edbef174ec0ab845b475686dffc7bd8948
             curr = curr->next;
         }
+        
         return curr->elem;
     }
     
