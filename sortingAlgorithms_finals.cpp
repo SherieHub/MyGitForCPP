@@ -14,33 +14,16 @@ void bubbleSort(int arr[], int size){
                 arr[j+1] = temp;
             }
         }
-        if(!flag){
-            break;
-        }
-    }
-}
-
-void insertionSort(int arr[], int size){
-    for(int i = 1; i < size; i++){
-        int key = arr[i];
-        int j = i-1;
-        
-        while(j >= 0 && arr[j] > key){
-            arr[j+1] = arr[j];
-            j--;
-        }
-        arr[j+1] = key;
+        if(!flag) break;
     }
 }
 
 void selectionSort(int arr[], int size){
-    
+    int min;
     for(int i = 0; i < size-1; i++){
-        int min = i;
+        min = i;
         for(int j = i+1; j < size; j++){
-            if(arr[j] < arr[min]){
-                min = j;
-            }
+            if(arr[j] < arr[min]) min = j;
         }
         
         if(min != i){
@@ -51,10 +34,22 @@ void selectionSort(int arr[], int size){
     }
 }
 
+void insertionSort(int arr[], int size){
+    for(int i = 0; i < size; i++){
+        int key = arr[i];
+        int j = i-1;
+        while(j >= 0 && arr[j] > key){
+            arr[j+1] = arr[j];
+            j--;
+        }
+        arr[j+1] = key;
+    }
+}
+
 void countingSort(int arr[], int size){
     int max = arr[0];
     
-    for(int i = 1; i < size; i++){
+    for(int i = 0; i < size; i++){
         if(arr[i] > max) max = arr[i];
     }
     
@@ -83,36 +78,40 @@ void countingSort(int arr[], int size){
     }
 }
 
-int partition(int arr[], int start, int end) {
+int partition(int arr[], int start, int end, int size){
     int pivot = arr[start];
-    int i = start + 1;
-
-    for (int j = start + 1; j <= end; j++) {
-        if (arr[j] < pivot) {
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
+    int i = start+1;
+    
+    for(int j = start+1; j <= end; j++){
+        if(arr[j] < pivot){
+            if(i != j && arr[i] != arr[j]){
+                int temp = arr[j];
+                arr[j] = arr[i];
+                arr[i] = temp;
+            }
             i++;
         }
     }
-
-    int temp = arr[start];
-    arr[start] = arr[i - 1];
-    arr[i - 1] = temp;
-
+    
+    if(start != i-1 && arr[start] != arr[i-1]){
+        int temp = arr[start];
+        arr[start] = arr[i-1];
+        arr[i-1] = temp;
+    }
+        
     return i - 1;
 }
 
-void quickSort(int arr[], int start, int end) {
-    if (start >= end) return;
-
-    int pivotIndex = partition(arr, start, end);
-    quickSort(arr, start, pivotIndex - 1);
-    quickSort(arr, pivotIndex + 1, end);
+void quickSort(int arr[], int start, int end, int size){
+    if(start >= end) return;
+    
+    int pivot = partition(arr, start, end, size);
+    quickSort(arr, start, pivot-1, size);
+    quickSort(arr, pivot+1, end, size);
 }
 
 void merge(int leftArr[], int leftSize, int rightArr[], int rightSize, int arr[]){
-    int i = 0, l = 0,  r = 0;
+    int i = 0, l = 0, r = 0;
     int size = leftSize + rightSize;
     
     while(l < leftSize && r < rightSize){
@@ -127,7 +126,7 @@ void merge(int leftArr[], int leftSize, int rightArr[], int rightSize, int arr[]
         arr[i++] = leftArr[l++];
     }
     
-     while(r < rightSize){
+    while(r < rightSize){
         arr[i++] = rightArr[r++];
     }
 }
@@ -163,10 +162,6 @@ void shellSort(int arr[], int size){
             
             if(j != i){
                 arr[j] = temp;
-                for(int k = 0; k < size; k++){
-                    cout << arr[k] << " ";
-                }
-                cout << endl;
             }
         }
     }
@@ -180,7 +175,6 @@ void counting(int arr[], int size, int exp){
     }
     
     int count[max+1];
-    
     for(int i = 0; i < max+1; i++){
         count[i] = 0;
     }
@@ -218,7 +212,7 @@ void radixSort(int arr[], int size){
 
 int main(){
     int arr[] = {45, 83, 11, 5, 23, 60, 34, 76, 1, 51, 15, 22, 89, 123, 16};
-    int size = 8;
+    int size = 15;
     
     cout << "Original Array: ";
     for(int i = 0; i < size; i++){
@@ -227,7 +221,7 @@ int main(){
     
     cout << endl;
     
-    countingSort(arr, size);
+    radixSort(arr, size);
     
     cout << "Sorted Array: ";
     for(int i = 0; i < size; i++){
