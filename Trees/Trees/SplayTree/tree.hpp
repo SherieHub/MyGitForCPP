@@ -1,5 +1,6 @@
 #include "node.hpp"
 #include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
 class BSTree {
     node* root;
@@ -14,36 +15,109 @@ class BSTree {
         return n;
     }
 
-    bool search(node* curr, int num) {
-        if (curr == NULL) {
-            return false;
-        }
-        if (num == curr->element) {
-            restructure(curr);
+    bool search(node* n, int num) {
+        if(!n) return false;
+        
+        if(num < n->element){
+            return search(n->left, num);
+        }else if(num > n->element){
+            return search(n->right, num);
+        }else if(num == n->element){
+            restructure(n);
             return true;
         }
-
-        if (num < curr->element) {
-            return search(curr->left, num);
-        }
-        return search(curr->right, num);
+        return false;
     }
-
-    node* search_node(node* curr, int num) {
-        if (num == curr->element) {
-            return curr;
+    
+    node* addRoot(int num){
+        if(root) throw logic_error("Already has root");
+        
+        root = new node;
+        root->element = num;
+        size++;
+        return root;
+    }
+    
+    node* addLeft(node* p, int num){
+        if(p->left) throw logic_error(to_string(p->element) + "Already has left child");
+        
+        p->left = new node;
+        p->left->element = num;
+        p->left->parent = p;
+        size++;
+        return p->left;
+    }
+      
+    node* addRight(node* p, int num){
+        if(p->right) throw logic_error(to_string(p->element) + "Already has right child");
+        
+        p->right = new node;
+        p->right->element = num;
+        p->right->parent = p;
+        size++;
+        return p->right;
+    } 
+    
+    bool insert_node(node* n, int num) {
+        if(!n){
+            addRoot(num);
+            return true;
         }
-
-        if (num < curr->element) {
-            if (curr->left != NULL) {
-                return search_node(curr->left, num);
+        
+        node* m;
+        
+        if(num < n->element){
+            if(n->left) return insert_node(n->left, num);
+            m = addLeft(n, num);
+            restructure(m);
+            return true;
+        }else if(num > n->element){
+            if(n->right) return insert_node(n->right, num);
+            m = addRight(n, num);
+            restructure(m);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    bool _remove(node* n, int num){
+        if(!n) return false;
+        
+        if(num < n->element){
+            return _remove(n->left, num);
+        }else if(num > n->element){
+            return _remove(n->right, num);
+        }else if(num == n->element){
+            remove_restructure(n);
+            
+            node* leftSubtree = n->left;
+            node* rightSubtree = n->right;
+            
+            if(leftSubtree) leftSubtree->parent = NULL;
+            if(rightSubtree) rightSubtree->parent = NULL;
+            
+            delete n;
+            size--;
+            
+            if(!rightSubtree){
+                root = leftSubtree;
+            }else{
+                node* temp = rightSubtree;
+                
+                while(temp->left){
+                    temp = temp->left;
+                }
+                
+                remove_restructure(temp);
+                root = temp;
+                
+                root->left = leftSubtree;
+                if(leftSubtree) leftSubtree->parent = root;
             }
-            return curr;
+            return true;
         }
-        if (curr->right != NULL) {
-            return search_node(curr->right, num);
-        }
-        return curr;
+        return false;
     }
 
     public:
@@ -55,227 +129,153 @@ class BSTree {
     bool search(int num) {
         return search(root, num);
     }
-
-    bool insert(int num) {
-        if (root == NULL) {
-            root = create_node(num, NULL);
-            size++;
+    
+    bool insert(int num){
+        if(!root){
+            root = addRoot(num);
             return true;
-        } else {
-            node* parent = search_node(root, num);
-            if (parent->element != num) {
-                node* newest = create_node(num, parent);
-                if (parent->element < num) {
-                    parent->right = newest;
-                } else {
-                    parent->left = newest;
-                }
-                restructure(newest);
-                size++;
-                return true;
-            }else{
-                restructure(parent);
-                return false;
-            }
         }
-        return false;
+        return insert_node(root, num);
     }
-
-    bool remove(int num) {
-      if (isEmpty()) {
-        return false;
-      }
-      node* rem_node = search_node(root, num);
-      if (rem_node->element != num) {
-        return false;
-      }
-
-      // FIND the number of children.
-      int children = 0;
-      // 0 - no children
-      // -1 - left child only
-      // 1 - right child only
-      // 2 - both children
-      if (rem_node->right) {
-        children = 1;
-      }
-      if (rem_node->left) {
-        if (children == 1) {
-          children = 2;
-        } else {
-          children = -1;
-        }
-      }
-
-      if (children == 0) { // NO CHILDREN
-        node* parent = rem_node->parent;
-        if (!parent) {
-          root = NULL;
-        } else {
-          if (rem_node == parent->left) {
-            parent->left = NULL;
-          } else {
-            parent->right = NULL;
-          }
-        }
-
-        free(rem_node);
-        size--;
-      } else if (children == -1 || children == 1) { // ONE CHILD
-        node* parent = rem_node->parent;
-        node* child;
-        if (children == -1) {
-          child = rem_node->left;
-        } else {
-          child = rem_node->right;
-        }
-
-        child->parent = parent;
-        if (!parent) {
-          root = child;
-        } else {
-          if (parent->left == rem_node) {
-            parent->left = child;
-          } else {
-            parent->right = child;
-          }
-        }
-
-        free(rem_node);
-        size--;
-      } else { // TWO CHILDREN
-        node* right_st = rem_node->right;
-        while (right_st->left != NULL) {
-          right_st = right_st->left;
-        }
-
-        int temp = right_st->element;
-        remove(temp);
-        rem_node->element = temp;
-      }
-      return true;
+    
+    bool remove(int num){
+        return _remove(root, num);
     }
-
-    // TODO implementation of rotate operation of x where
-    //  |
-    //  y
-    //   \
-    //    x <- curr
-    void zigleft(node* curr) {
-        node* y = curr->parent;
+    
+    void zigLeft(node* x){
+        node* y = x->parent;
         node* z = y->parent;
-        node* t2 = curr->left;
+        node* t2 = x->left;
         
-        if(!y || !curr)return;
+        if(!y || !x) return;
         
         if(z){
-            if(z->right == y){
-                z->right = curr;
+            if(z->left == y){
+                z->left = x;
             }else{
-                z->left = curr;
+                z->right = x;
             }
-            curr->parent = z;
+            x->parent = z;
         }else{
-            root = curr;
-            curr->parent = nullptr;
+            root = x;
+            x->parent = NULL;
         }
         
-        curr->left = y;
-        y->parent = curr;
+        x->left = y;
+        y->parent = x;
         y->right = t2;
         
         if(t2){
             t2->parent = y;
         }
     }
-
-    // TODO implementation of rotate operation of x where
-    //   |
-    //   y
-    //  /
-    // x <- curr
-    void zigright(node* curr) {
-        node* y = curr->parent;
+    
+    void zigRight(node* x){
+        node* y = x->parent;
         node* z = y->parent;
-        node* t2 = curr->right;
+        node* t2 = x->right;
         
-        if(!y || !curr)return;
+        if(!y || !x) return;
         
         if(z){
-            if(z->right == y){
-                z->right = curr;
+            if(z->left == y){
+                z->left = x;
             }else{
-                z->left = curr;
+                z->right = x;
             }
-            curr->parent = z;
+            x->parent = z;
         }else{
-            root = curr;
-            curr->parent = nullptr;
+            root = x;
+            x->parent = NULL;
         }
         
-        curr->right = y;
-        y->parent = curr;
+        x->right = y;
+        y->parent = x;
         y->left = t2;
         
         if(t2){
             t2->parent = y;
         }
     }
-
-    // GIVEN the child (or x), find the parent (or y), and the grandparent if any (or z).
-    // Splay the child to the root recursively or iteratively.
-    void restructure(node* child) {
-        while(child->parent){
-            node* par = child->parent;
-            bool ptoc_right = false;
-            if (par->right == child) {
-                ptoc_right = true;
-            }
     
-            node* gp = par->parent;
-            if(!gp){
-                if(ptoc_right){
-                    zigleft(child);
+    void restructure(node* x){
+        while(x->parent){
+            node* y = x->parent;
+            node* z = y->parent;
+            
+            if(!y) return;
+            
+            if(!z){
+                if(y->right == x){
+                    zigLeft(x);
                     cout << "ZIGLEFT" << endl;
                 }else{
-                    zigright(child);
+                    zigRight(x);
                     cout << "ZIGRIGHT" << endl;
                 }
                 break;
             }
             
-            bool gtop_right = false;
-            if (gp->right == par) {
-                gtop_right = true;
+            if(z->right == y && y->right == x){
+                zigLeft(y);
+                zigLeft(x);
+                cout << "ZIGZIGLEFT" <<endl;
             }
-    
-           if (gtop_right && ptoc_right) {
-            zigleft(par);
-            zigleft(child);
-            cout << "ZIGZIGLEFT" <<endl;
-          }
-          
-          else if (gtop_right && !ptoc_right) {
-            zigright(child);
-            zigleft(child);
-            cout << "ZIGZAGLEFT" << endl;
-          }
-          
-          else if (!gtop_right && !ptoc_right) {
-            zigright(par);
-            zigright(child);
-            cout << "ZIGZIGRIGHT" << endl;
-          }
-          
-          else {
-            zigleft(child);
-            zigright(child);
-            cout << "ZIGZAGRIGHT" << endl;
-          }
+            else if(z->right == y && y->left == x){
+                zigRight(x);
+                zigLeft(x);
+                cout << "ZIGZAGLEFT" << endl;
+            }
+            else if(z->left == y && y->left == x){
+                zigRight(y);
+                zigRight(x);
+                cout << "ZIGZIGRIGHT" <<endl;
+            }
+            else if(z->left == y && y->right == x){
+                zigLeft(x);
+                zigRight(x);
+                cout << "ZIGZAGRIGHT" << endl;
+            }
+            root = x;
         }
-        root = child;
     }
-
+    
+    void remove_restructure(node* x){
+        while(x->parent){
+            node* y = x->parent;
+            node* z = y->parent;
+            
+            if(!y) return;
+            
+            if(!z){
+                if(y->right == x){
+                    zigLeft(x);
+                }else{
+                    zigRight(x);
+                }
+                break;
+            }
+            
+            if(z->right == y && y->right == x){
+                zigLeft(y);
+                zigLeft(x);
+            }
+            else if(z->right == y && y->left == x){
+                zigRight(x);
+                zigLeft(x);
+            }
+            else if(z->left == y && y->left == x){
+                zigRight(y);
+                zigRight(x);
+            }
+            else if(z->left == y && y->right == x){
+                zigLeft(x);
+                zigRight(x);
+            }
+            root = x;
+        }
+    }
+    
     // WARNING. Do not modify the methods below.
     // Doing so will nullify your score for this activity.
     void print() {
